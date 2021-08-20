@@ -19,6 +19,14 @@ const workoutSeed = [
         reps: 10,
         sets: 4,
       },
+      {
+        type: 'resistance',
+        name: 'Lunges',
+        duration: 20,
+        weight: 0,
+        reps: 10,
+        sets: 4,
+      },
     ],
   },
   {
