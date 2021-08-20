@@ -1,9 +1,9 @@
 async function initWorkout() {
   const lastWorkout = await API.getLastWorkout();
-  console.log("Last workout:", lastWorkout);
+  // console.log("Last workout:", lastWorkout);
   if (lastWorkout) {
     document
-      .querySelector("a[href='/exercise?']")
+      .querySelector(`a[href="/exercise?"]`)
       .setAttribute("href", `/exercise?id=${lastWorkout._id}`);
 
     // Listen, I didn't want to do this with mongoose...
