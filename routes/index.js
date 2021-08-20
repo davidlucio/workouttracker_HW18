@@ -2,8 +2,11 @@
 const router = require("express").Router();
 const db = require("../models");
 const mongoose = require("mongoose");
+var ObjectId = mongoose.Types.ObjectId;
 
 
+// Somehow this became the "Create New Workout?"
+// POST New Workout = "/api/workouts"
 router.get("/exercise", (req, res) => {
     if(req.query.id != undefined){
         res.redirect(`/exercise.html?id=${req.query.id}`);
@@ -25,6 +28,7 @@ router.get("/exercise", (req, res) => {
     }
 });
 
+// This is the stats page I guess?
 router.get("/stats", (req, res) => {
     res.redirect('/stats.html');
 });
@@ -32,12 +36,14 @@ router.get("/stats", (req, res) => {
 
 // GET Last Workout
 router.get( "/api/workouts", (req, res) => {
-    db.Workout.find()
-    .sort({ day : -1 })
+    db.Workout.find({
+        exercises: {
+            $exists: true,
+            $not: {$size: 0}
+        }
+    })
     //.populate("exercises")
     .then( workoutdata => {
-        console.log("\nRetrieved last workout\n");
-        // console.log(workoutdata);
         res.json(workoutdata);
     })
     .catch( err => {
@@ -46,75 +52,27 @@ router.get( "/api/workouts", (req, res) => {
     });
 });
 
-// GET Workouts Range = "/api/workouts/range" ???
 
-// POST New Workout = "/api/workouts"
+// PUT Add Exercise = "/api/workouts/" + Workout id
 router.put("/api/workouts/:id", (req, res) => {
-
-    console.log(`\nAttempting to create workout... ${req.params.id} \n`);
-    console.log(req.body)
-
     db.Workout.findOneAndUpdate(
-        { _id: req.params.id },
+        { _id : new ObjectId(req.params.id) },
         { $push:
             { exercises : req.body }
         },
         { new: true }
     )
-    .then(
-
-    )
-    .catch(
-        
-    )
-
-    //     }}
-    // )
-
-    /** **
-    db.Workout.create(body)
-        .then(result => {
-            res.json(result);
-        })
-        .catch(err => {
-            res.json(err);
-        });
-    /** **/
-});
-
-
-// POST Add Exercise = "/api/workouts/" + Workout id
-
-
-
-/**
-
-app.post("/submit", ({ body }, res) => {
-  db.Note.create(body)
-    .then(({ _id }) => db.User.findOneAndUpdate({}, { $push: { notes: _id } }, { new: true }))
-    .then(dbUser => {
-      res.json(dbUser);
+    .then( newExerciseData => {
+        res.json(newExerciseData);
     })
-    .catch(err => {
-      res.json(err);
+    .catch( err => {
+        res.json(err);
     });
 });
 
-app.get("/populateduser", (req, res) => {
-  db.User.find({})
-    .populate("notes")
-    .then(dbUser => {
-      res.json(dbUser);
-    })
-    .catch(err => {
-      res.json(err);
-    });
-});
 
-app.listen(PORT, () => {
-  console.log(`App running on port ${PORT}!`);
-});
-/****/
+// GET Workouts Range = "/api/workouts/range" ???
+
 
 
 
